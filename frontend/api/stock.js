@@ -1,31 +1,48 @@
 export default async function handler(request) {
-  const { searchParams } = new URL(request.url);
-  const symbol = searchParams.get("symbol");
-
-  if (!symbol) {
-    return new Response(JSON.stringify({ error: "Symbol required" }), {
-      status: 400,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
-
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 5000); // ⏱ 5 sec max
+    const { searchParams } = new URL(request.url);
+    const symbol = searchParams.get("symbol");
 
-    const response = await fetch(
-      `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbol}`,
-      {
-        headers: {
-          "User-Agent": "Mozilla/5.0",
-        },
-        signal: controller.signal,
-      }
-    );
+    if (!symbol) {
+      return new Response(JSON.stringify({ error: "Symbol required" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
 
-    clearTimeout(timeout);
+    const API_KEY = process.env.FINNHUB_API_KEY;
 
-    const data = await response.json();
+    if (!API_KEY) {
+      return new Response(
+        JSON.stringify({ error: "API key missing in environment variables" }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    const url = `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${API_KEY}`;
+
+    const response = await fetch(url);
+
+    const text = await response.text(); // safer than .json()
+
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      return new Response(
+        JSON.stringify({
+          error: "Invalid JSON from Finnhub",
+          raw: text.slice(0, 200),
+        }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
 
     return new Response(JSON.stringify(data), {
       status: 200,
@@ -35,7 +52,7 @@ export default async function handler(request) {
   } catch (err) {
     return new Response(
       JSON.stringify({
-        error: "Timeout or fetch failed",
+        error: "Function crashed",
         message: err.message,
       }),
       {
