@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Portfolio — Stock Analyzer</title>
+  <link rel="stylesheet" href="/static/css/styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body class="portfolio-body">
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="24" height="24">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+      </svg>
+      Stock Analyzer
+    </a>
+    <div class="navbar-search-wrap">
+      <div class="navbar-search-box">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input id="navSearchInput" type="text" placeholder="Search stocks…" autocomplete="off" spellcheck="false">
+      </div>
+      <div id="navSearchDropdown" class="nav-ac-dropdown"></div>
+    </div>
+    <div class="navbar-right">
+      <ul class="navbar-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/portfolio" class="active-nav">Portfolio</a></li>
+        <li><a href="#">Screener</a></li>
+      </ul>
+      <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+          <circle cx="12" cy="12" r="5"/>
+          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="pf-main">
+
+    <!-- Page header -->
+    <div class="pf-page-header">
+      <div>
+        <h1 class="pf-title">My Portfolio</h1>
+        <p class="pf-subtitle">Track your NSE &amp; BSE holdings against live prices</p>
+      </div>
+      <button class="btn-add-stock" onclick="toggleAddPanel()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="15" height="15">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+        Add Stock
+      </button>
+    </div>
+
+    <!-- Summary cards -->
+    <div class="pf-summary" id="pfSummary" style="display:none">
+      <div class="pf-card">
+        <div class="pf-card-label">Total Invested</div>
+        <div class="pf-card-value" id="pfTotalInvested">—</div>
+      </div>
+      <div class="pf-card">
+        <div class="pf-card-label">Current Value</div>
+        <div class="pf-card-value" id="pfCurrentValue">—</div>
+      </div>
+      <div class="pf-card">
+        <div class="pf-card-label">Total P&amp;L</div>
+        <div class="pf-card-value" id="pfTotalPnL">—</div>
+      </div>
+      <div class="pf-card">
+        <div class="pf-card-label">Overall Return</div>
+        <div class="pf-card-value" id="pfReturn">—</div>
+      </div>
+    </div>
+
+    <!-- Add stock panel -->
+    <div class="add-stock-panel" id="addPanel">
+      <div class="add-panel-header">
+        <h3>Add a Stock</h3>
+        <button class="add-close-btn" onclick="cancelAdd()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16">
+            <path d="M18 6 6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="add-search-wrap">
+        <input id="addSearchInput" type="text" class="add-search-input" placeholder="Search for a stock (e.g. Reliance, Infosys)…" autocomplete="off" spellcheck="false">
+        <div id="addSearchDropdown" class="add-ac-dropdown"></div>
+      </div>
+
+      <div class="add-details" id="addDetails" style="display:none">
+        <div class="add-fields">
+          <div class="add-field">
+            <label>Quantity</label>
+            <input id="addQty" type="number" min="0.001" step="0.001" placeholder="e.g. 10">
+          </div>
+          <div class="add-field">
+            <label>Buy Price (₹)</label>
+            <input id="addBuyPrice" type="number" min="0.01" step="0.01" placeholder="e.g. 2400">
+          </div>
+          <div class="add-field">
+            <label>Buy Date</label>
+            <input id="addBuyDate" type="date">
+          </div>
+        </div>
+        <div class="add-actions">
+          <button class="btn-confirm-add" onclick="confirmAddStock()">Add to Portfolio</button>
+          <button class="btn-cancel-add" onclick="cancelAdd()">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Holdings + Insights content area -->
+    <div id="pfContent"></div>
+
+    <!-- Insights (hidden until portfolio has data) -->
+    <div class="pf-insights" id="pfInsights" style="display:none">
+      <div class="insight-card">
+        <div class="insight-label">Best Performer</div>
+        <div class="insight-name" id="pfBestName">—</div>
+        <div class="insight-val gain" id="pfBestReturn">—</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-label">Worst Performer</div>
+        <div class="insight-name" id="pfWorstName">—</div>
+        <div class="insight-val loss" id="pfWorstReturn">—</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-label">Portfolio Allocation</div>
+        <div id="pfAlloc" class="alloc-list"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">Stock Analyzer</div>
+          <p class="footer-desc">A modern tool for tracking Indian stock investments. Data from Yahoo Finance &amp; TradingView.</p>
+          <div class="footer-theme-row">
+            <span>Appearance:</span>
+            <button class="footer-theme-btn" onclick="toggleTheme()">
+              <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+              </svg>
+              <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13">
+                <circle cx="12" cy="12" r="5"/>
+                <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+              </svg>
+              <span id="footerThemeLabel">Dark Mode</span>
+            </button>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Navigate</h4>
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/portfolio">Portfolio</a></li>
+            <li><a href="#">Screener</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Popular</h4>
+          <ul>
+            <li><a href="/stock/RELIANCE.NS">Reliance</a></li>
+            <li><a href="/stock/TCS.NS">TCS</a></li>
+            <li><a href="/stock/INFY.NS">Infosys</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2025 Stock Analyzer. Not investment advice.</span>
+        <span>Data: Yahoo Finance &amp; TradingView</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/static/js/common.js"></script>
+  <script src="/static/js/portfolio.js"></script>
+</body>
+</html>

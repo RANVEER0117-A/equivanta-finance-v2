@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ symbol }} — Stock Analyzer</title>
+  <link rel="stylesheet" href="/static/css/styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body class="stock-body">
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="24" height="24">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+      </svg>
+      Stock Analyzer
+    </a>
+    <div class="navbar-search-wrap">
+      <div class="navbar-search-box">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input id="navSearchInput" type="text" placeholder="Search stocks…" autocomplete="off" spellcheck="false">
+      </div>
+      <div id="navSearchDropdown" class="nav-ac-dropdown"></div>
+    </div>
+    <div class="navbar-right">
+      <ul class="navbar-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/portfolio">Portfolio</a></li>
+        <li><a href="#">Screener</a></li>
+      </ul>
+      <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+          <circle cx="12" cy="12" r="5"/>
+          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- COMPANY SUB-NAV -->
+  <div class="company-subnav" id="company-subnav">
+    <div class="company-subnav-inner">
+      <div class="company-subnav-top">
+        <span class="subnav-company-name" id="subnav-name">{{ symbol }}</span>
+        <span class="subnav-price" id="subnav-price">—</span>
+      </div>
+      <nav class="company-subnav-tabs">
+        <a href="#top"           class="subnav-tab" data-section="top">Summary</a>
+        <a href="#chart"         class="subnav-tab" data-section="chart">Chart</a>
+        <a href="#about"         class="subnav-tab" data-section="about">About</a>
+        <a href="#quarters"      class="subnav-tab" data-section="quarters">Quarters</a>
+        <a href="#profit-loss"   class="subnav-tab" data-section="profit-loss">P&amp;L</a>
+        <a href="#balance-sheet" class="subnav-tab" data-section="balance-sheet">Balance Sheet</a>
+        <a href="#cash-flow"     class="subnav-tab" data-section="cash-flow">Cash Flow</a>
+        <a href="#ratios"        class="subnav-tab" data-section="ratios">Ratios</a>
+      </nav>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="stock-container">
+
+    <a href="/" class="back-link">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="m15 18-6-6 6-6"/>
+      </svg>
+      Back to search
+    </a>
+
+    <section id="top" class="section-card">
+      <div class="company-header">
+        <div>
+          <h1 class="company-title" id="company-name">Loading…</h1>
+          <div class="company-meta">
+            <span class="exchange-badge" id="exchange-badge">NSE</span>
+            <span class="company-sector-tag" id="company-sector"></span>
+          </div>
+        </div>
+        <div class="company-price-block">
+          <div class="company-price" id="current-price">—</div>
+          <div class="company-price-label">Current Price (₹)</div>
+        </div>
+      </div>
+      <div class="metrics-grid" id="metrics-grid">
+        <div class="metrics-loading"><div class="spinner"></div></div>
+      </div>
+    </section>
+
+    <section id="chart" class="section-card">
+      <div class="section-header">Price Chart</div>
+      <div id="tradingview_chart" style="height: 500px;"></div>
+    </section>
+
+    <section id="about" class="section-card">
+      <div class="section-header">About the Company</div>
+      <div class="about-content" id="about-content">
+        <div class="loading-spinner"><div class="spinner"></div></div>
+      </div>
+    </section>
+
+    <section id="quarters" class="section-card">
+      <div class="section-header">Quarterly Results <span class="unit-note">Figures in ₹ Crore</span></div>
+      <div class="table-wrapper" id="quarterly-table">
+        <div class="loading-spinner"><div class="spinner"></div></div>
+      </div>
+    </section>
+
+    <section id="profit-loss" class="section-card">
+      <div class="section-header">Profit &amp; Loss (Annual) <span class="unit-note">Figures in ₹ Crore</span></div>
+      <div class="table-wrapper" id="annual-table">
+        <div class="loading-spinner"><div class="spinner"></div></div>
+      </div>
+    </section>
+
+    <section id="balance-sheet" class="section-card">
+      <div class="section-header">Balance Sheet <span class="unit-note">Figures in ₹ Crore</span></div>
+      <div class="table-wrapper" id="bs-table">
+        <div class="loading-spinner"><div class="spinner"></div></div>
+      </div>
+    </section>
+
+    <section id="cash-flow" class="section-card">
+      <div class="section-header">Cash Flows <span class="unit-note">Figures in ₹ Crore</span></div>
+      <div class="table-wrapper" id="cf-table">
+        <div class="loading-spinner"><div class="spinner"></div></div>
+      </div>
+    </section>
+
+    <section id="ratios" class="section-card">
+      <div class="section-header">Key Financial Ratios</div>
+      <div id="ratios-content">
+        <div class="loading-spinner"><div class="spinner"></div></div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">Stock Analyzer</div>
+          <p class="footer-desc">A modern tool for analyzing Indian stocks on NSE and BSE. Powered by yfinance and TradingView.</p>
+          <div class="footer-theme-row">
+            <span>Appearance:</span>
+            <button class="footer-theme-btn" onclick="toggleTheme()">
+              <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+              </svg>
+              <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13">
+                <circle cx="12" cy="12" r="5"/>
+                <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+              </svg>
+              <span id="footerThemeLabel">Dark Mode</span>
+            </button>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Navigate</h4>
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/portfolio">Portfolio</a></li>
+            <li><a href="#">Screener</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Indices</h4>
+          <ul>
+            <li><a href="/stock/^NSEI">Nifty 50</a></li>
+            <li><a href="/stock/^BSESN">Sensex</a></li>
+            <li><a href="/stock/^CNXBANK">Bank Nifty</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2025 Stock Analyzer. All rights reserved.</span>
+        <span>Data from Yahoo Finance &amp; TradingView</span>
+      </div>
+      <p class="footer-disclaimer">Disclaimer: For informational purposes only. Not investment advice.</p>
+    </div>
+  </footer>
+
+  <script>window.STOCK_SYMBOL = {{ symbol | tojson }};</script>
+  <script src="/static/js/common.js"></script>
+  <script src="/static/js/stock.js"></script>
+</body>
+</html>

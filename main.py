@@ -1,0 +1,93 @@
+"""
+EQUIVANTA FINANCE V2 — FastAPI Backend
+Production-grade, modular, high-performance fintech API.
+"""
+
+import os
+from dotenv import load_dotenv
+from fastapi import FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
+
+from services.finance_service import get_fundamentals, get_financials
+from services.autocomplete_service import search_stocks
+
+load_dotenv()
+
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*").split(",")
+
+app = FastAPI(
+    title="EQUIVANTA FINANCE V2",
+    description="High-performance fintech API with caching, modular services, and optimised market data.",
+    version="2.0.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=ALLOWED_ORIGINS,
+    allow_methods=["GET", "OPTIONS"],
+    allow_headers=["*"],
+)
+
+
+# ── Routes ────────────────────────────────────────────────────────────────────
+
+@app.get("/", tags=["Health"])
+def root():
+    """Health-check endpoint."""
+    return {"status": "EQUIVANTA FINANCE V2 API running", "version": "2.0.0"}
+
+
+@app.get("/fundamentals", tags=["Market Data"])
+def fundamentals_endpoint(
+    symbol: str = Query(..., description="Yahoo Finance symbol, e.g. RELIANCE.NS or AAPL")
+):
+    """
+    Returns key fundamentals for the given ticker symbol.
+    Responses are cached in-memory for 15 minutes.
+    """
+    if not symbol or not symbol.strip():
+        raise HTTPException(status_code=400, detail="symbol parameter is required")
+
+    data = get_fundamentals(symbol.strip().upper())
+
+    if "error" in data:
+        raise HTTPException(status_code=502, detail=data["error"])
+
+    return data
+
+
+@app.get("/financials", tags=["Market Data"])
+def financials_endpoint(
+    symbol: str = Query(..., description="Yahoo Finance symbol, e.g. RELIANCE.NS")
+):
+    """
+    Returns quarterly/annual P&L, balance sheet, and cash flow data.
+    Figures are in INR Crore. Cached in-memory for 30 minutes.
+    """
+    if not symbol or not symbol.strip():
+        raise HTTPException(status_code=400, detail="symbol parameter is required")
+
+    data = get_financials(symbol.strip().upper())
+
+    if "error" in data:
+        return {"quarterly": {"columns": [], "rows": []}, "annual": {"columns": [], "rows": []},
+                "balance_sheet": {"columns": [], "rows": []}, "cash_flow": {"columns": [], "rows": []}}
+
+    return data
+
+
+@app.get("/autocomplete", tags=["Search"])
+def autocomplete_endpoint(
+    q: str = Query(..., description="Search query — company name or symbol prefix")
+):
+    """
+    Returns up to 10 matching Indian stocks for the given query string.
+    Matches against company name and symbol.
+    """
+    if not q or len(q.strip()) < 1:
+        return []
+
+    results = search_stocks(q.strip())
+    return results

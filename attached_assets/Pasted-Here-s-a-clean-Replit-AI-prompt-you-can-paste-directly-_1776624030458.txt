@@ -1,0 +1,70 @@
+Here’s a clean **Replit AI prompt** you can paste directly:
+
+---
+
+**PROMPT:**
+
+Fix and complete this project.
+
+I started building a full-stack finance web app but couldn’t finish it due to limited coding knowledge. The current project is partially built in Flask + frontend JS.
+
+### What I want you to do:
+
+### 1. Upgrade Architecture
+
+* Migrate backend from **Flask → FastAPI**
+* Convert frontend to **React (modern structure)**
+* Ensure clean separation between frontend and backend
+
+### 2. Backend (FastAPI)
+
+* Refactor existing Flask routes into FastAPI endpoints
+* Ensure proper async support where needed
+* Add CORS properly for frontend connection
+* Keep API clean, structured, and production-ready
+* Add environment variable support
+* Make sure API is fast and optimized for financial data calls
+
+### 3. Frontend (React)
+
+* Build or refactor frontend into React app
+* Ensure it connects properly to backend API
+* Fix all broken API calls / routing issues
+* Make UI load fast and without errors
+* Keep it minimal, clean, and dashboard-style (finance app)
+
+### 4. Deployment Setup
+
+* Backend must be ready for **Render deployment**
+* Frontend must be ready for **Vercel deployment**
+* Add correct production build configs
+* Ensure environment variables are properly handled for both
+
+### 5. Fixes Required
+
+* Fix any broken imports, routes, or file structure issues
+* Ensure app runs without manual debugging
+* Remove unused or broken legacy Flask code
+* Make sure everything starts with simple commands
+
+### 6. Performance
+
+* Optimize API response time
+* Ensure frontend loads instantly with correct data rendering
+* Avoid unnecessary re-renders or blocking calls
+
+### Goal:
+
+A fully working production-ready system:
+
+* FastAPI backend (Render)
+* React frontend (Vercel)
+* Clean API communication
+* No broken endpoints
+* No manual debugging needed
+
+If anything is missing in the current codebase, rebuild it properly instead of leaving placeholders.
+
+---
+
+If you want, I can also convert this into a **perfect folder structure + deployment checklist** so you don’t mess up Render/Vercel again.

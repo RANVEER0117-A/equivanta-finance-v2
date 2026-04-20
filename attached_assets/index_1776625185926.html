@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stock Analyzer — Indian Stock Market</title>
+  <link rel="stylesheet" href="/static/css/styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="24" height="24">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+      </svg>
+      Stock Analyzer
+    </a>
+    <div class="navbar-search-wrap">
+      <div class="navbar-search-box">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input id="navSearchInput" type="text" placeholder="Search stocks…" autocomplete="off" spellcheck="false">
+      </div>
+      <div id="navSearchDropdown" class="nav-ac-dropdown"></div>
+    </div>
+    <div class="navbar-right">
+      <ul class="navbar-links">
+        <li><a href="/" class="active-nav">Home</a></li>
+        <li><a href="/portfolio">Portfolio</a></li>
+        <li><a href="#">Screener</a></li>
+      </ul>
+      <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+          <circle cx="12" cy="12" r="5"/>
+          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <main class="hero">
+    <div class="hero-badge">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M3 3v18h18"/>
+        <path d="m19 9-5 5-4-4-3 3"/>
+      </svg>
+      NSE &amp; BSE Listed Stocks
+    </div>
+
+    <h1>Search &amp; Analyze<br /><span>Indian Stocks</span></h1>
+    <p>Real-time charts, fundamentals, and key metrics for every stock on NSE and BSE.</p>
+
+    <div class="search-container">
+      <div class="search-wrapper">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2.2">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input id="searchInput" type="text" placeholder="Search by company name or symbol…" autocomplete="off"/>
+        <button class="search-btn">Search</button>
+      </div>
+      <div id="autocompleteDropdown" class="autocomplete-dropdown"></div>
+    </div>
+
+    <div class="features-strip">
+      <div class="feature-chip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+        </svg>
+        Live TradingView Charts
+      </div>
+      <div class="feature-chip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+          <path d="M3 9h18M9 21V9"/>
+        </svg>
+        Key Fundamentals
+      </div>
+      <div class="feature-chip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M16 8v8M12 11v5M8 14v2M3 20h18"/>
+        </svg>
+        Portfolio Tracker
+      </div>
+    </div>
+  </main>
+
+  <!-- POPULAR STOCKS -->
+  <section class="popular-section">
+    <div class="section-title">Popular Stocks</div>
+    <div class="popular-chips">
+      <a class="popular-chip" href="/stock/RELIANCE.NS">RELIANCE</a>
+      <a class="popular-chip" href="/stock/TCS.NS">TCS</a>
+      <a class="popular-chip" href="/stock/HDFCBANK.NS">HDFC Bank</a>
+      <a class="popular-chip" href="/stock/INFY.NS">Infosys</a>
+      <a class="popular-chip" href="/stock/WIPRO.NS">Wipro</a>
+      <a class="popular-chip" href="/stock/ICICIBANK.NS">ICICI Bank</a>
+      <a class="popular-chip" href="/stock/HINDUNILVR.NS">HUL</a>
+      <a class="popular-chip" href="/stock/BAJFINANCE.NS">Bajaj Finance</a>
+      <a class="popular-chip" href="/stock/SBIN.NS">SBI</a>
+      <a class="popular-chip" href="/stock/MARUTI.NS">Maruti</a>
+      <a class="popular-chip" href="/stock/TATAMOTORS.NS">Tata Motors</a>
+      <a class="popular-chip" href="/stock/ADANIENT.NS">Adani Ent.</a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">Stock Analyzer</div>
+          <p class="footer-desc">A modern tool for analyzing Indian stocks on NSE and BSE. Powered by yfinance and TradingView.</p>
+          <div class="footer-theme-row">
+            <span>Appearance:</span>
+            <button class="footer-theme-btn" onclick="toggleTheme()">
+              <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+              </svg>
+              <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13">
+                <circle cx="12" cy="12" r="5"/>
+                <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+              </svg>
+              <span id="footerThemeLabel">Dark Mode</span>
+            </button>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Navigate</h4>
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/portfolio">Portfolio</a></li>
+            <li><a href="#">Screener</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Indices</h4>
+          <ul>
+            <li><a href="/stock/^NSEI">Nifty 50</a></li>
+            <li><a href="/stock/^BSESN">Sensex</a></li>
+            <li><a href="/stock/^CNXBANK">Bank Nifty</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2025 Stock Analyzer. All rights reserved.</span>
+        <span>Data from Yahoo Finance &amp; TradingView</span>
+      </div>
+      <p class="footer-disclaimer">Disclaimer: For informational purposes only. Not investment advice.</p>
+    </div>
+  </footer>
+
+  <script src="/static/js/common.js"></script>
+  <script src="/static/js/main.js"></script>
+</body>
+</html>
