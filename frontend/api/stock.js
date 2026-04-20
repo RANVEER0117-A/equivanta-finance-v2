@@ -1,7 +1,7 @@
 export default async function handler(request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const symbol = searchParams.get("symbol");
+    const urlObj = new URL(request.url, "http://localhost");
+    const symbol = urlObj.searchParams.get("symbol");
 
     if (!symbol) {
       return new Response(JSON.stringify({ error: "Symbol required" }), {
@@ -14,35 +14,22 @@ export default async function handler(request) {
 
     if (!API_KEY) {
       return new Response(
-        JSON.stringify({ error: "API key missing in environment variables" }),
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        }
+        JSON.stringify({ error: "Missing API key" }),
+        { status: 500 }
       );
     }
 
-    const url = `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${API_KEY}`;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
 
-    const response = await fetch(url);
+    const response = await fetch(
+      `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${API_KEY}`,
+      { signal: controller.signal }
+    );
 
-    const text = await response.text(); // safer than .json()
+    clearTimeout(timeout);
 
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch {
-      return new Response(
-        JSON.stringify({
-          error: "Invalid JSON from Finnhub",
-          raw: text.slice(0, 200),
-        }),
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-    }
+    const data = await response.json();
 
     return new Response(JSON.stringify(data), {
       status: 200,
@@ -52,13 +39,10 @@ export default async function handler(request) {
   } catch (err) {
     return new Response(
       JSON.stringify({
-        error: "Function crashed",
+        error: "Request failed",
         message: err.message,
       }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      }
+      { status: 500 }
     );
   }
 }
