@@ -1,14 +1,17 @@
 export default async function handler(request) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const symbol = searchParams.get("symbol");
+  const { searchParams } = new URL(request.url);
+  const symbol = searchParams.get("symbol");
 
-    if (!symbol) {
-      return new Response(JSON.stringify({ error: "Symbol required" }), {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
+  if (!symbol) {
+    return new Response(JSON.stringify({ error: "Symbol required" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000); // ⏱ 5 sec max
 
     const response = await fetch(
       `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbol}`,
@@ -16,39 +19,23 @@ export default async function handler(request) {
         headers: {
           "User-Agent": "Mozilla/5.0",
         },
+        signal: controller.signal,
       }
     );
 
-    const text = await response.text(); // 👈 IMPORTANT
+    clearTimeout(timeout);
 
-    let data;
-    try {
-      data = JSON.parse(text); // safe parse
-    } catch (e) {
-      return new Response(
-        JSON.stringify({
-          error: "Invalid response from Yahoo",
-          raw: text.slice(0, 200),
-        }),
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-    }
+    const data = await response.json();
 
     return new Response(JSON.stringify(data), {
       status: 200,
-      headers: {
-        "Content-Type": "application/json",
-        "Cache-Control": "s-maxage=60",
-      },
+      headers: { "Content-Type": "application/json" },
     });
 
   } catch (err) {
     return new Response(
       JSON.stringify({
-        error: "Function crashed",
+        error: "Timeout or fetch failed",
         message: err.message,
       }),
       {
