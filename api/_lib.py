@@ -257,6 +257,56 @@ def get_quick_price(symbol):
     }
 
 
+def get_price_alphavantage(symbol, apikey):
+    """Fetch price from Alpha Vantage GLOBAL_QUOTE endpoint. Free tier: 25 req/day."""
+    url = (
+        "https://www.alphavantage.co/query?function=GLOBAL_QUOTE"
+        f"&symbol={urllib.parse.quote(symbol)}&apikey={urllib.parse.quote(apikey)}"
+    )
+    _, body = _http_get(url)
+    data = json.loads(body)
+    if "Note" in data or "Information" in data:
+        raise ValueError("Alpha Vantage rate limit reached. Try again tomorrow or upgrade your plan.")
+    gq = data.get("Global Quote") or {}
+    price = safe_float(gq.get("05. price"))
+    change = safe_float(gq.get("09. change"))
+    pct_raw = (gq.get("10. change percent") or "").replace("%", "").strip()
+    pct_change = safe_float(pct_raw)
+    if price is None:
+        raise ValueError("No price data returned by Alpha Vantage. Check the symbol format (e.g. RELIANCE.BSE).")
+    return {
+        "symbol": symbol,
+        "price": price,
+        "change": change or 0.0,
+        "percentChange": pct_change or 0.0,
+        "source": "alphavantage",
+    }
+
+
+def get_price_twelvedata(symbol, apikey):
+    """Fetch price from Twelve Data quote endpoint. Free tier: 800 req/day."""
+    url = (
+        f"https://api.twelvedata.com/quote?symbol={urllib.parse.quote(symbol)}"
+        f"&apikey={urllib.parse.quote(apikey)}"
+    )
+    _, body = _http_get(url)
+    data = json.loads(body)
+    if data.get("status") == "error":
+        raise ValueError(f"Twelve Data: {data.get('message', 'unknown error')}")
+    price = safe_float(data.get("close"))
+    change = safe_float(data.get("change"))
+    pct_change = safe_float(data.get("percent_change"))
+    if price is None:
+        raise ValueError("No price data returned by Twelve Data. Check the symbol (e.g. RELIANCE:NSE).")
+    return {
+        "symbol": symbol,
+        "price": price,
+        "change": change or 0.0,
+        "percentChange": pct_change or 0.0,
+        "source": "twelvedata",
+    }
+
+
 def get_financials(symbol):
     """
     Financial tables (P&L / BS / CF) require quoteSummary auth.

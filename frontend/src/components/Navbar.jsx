@@ -1,12 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { getAutocomplete } from "../api/client.js";
+import Settings from "./Settings.jsx";
 
 export default function Navbar() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [open, setOpen] = useState(false);
   const [theme, setTheme] = useState(() => localStorage.getItem("sa_theme") || "light");
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const timerRef = useRef(null);
   const wrapRef = useRef(null);
   const navigate = useNavigate();
@@ -65,66 +67,80 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="navbar">
-      <Link to="/" className="navbar-brand">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" width="24" height="24">
-          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-        </svg>
-        Stock Analyzer
-      </Link>
-
-      <div className="navbar-search-wrap" ref={wrapRef}>
-        <div className="navbar-search-box">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
+    <>
+      <nav className="navbar">
+        <Link to="/" className="navbar-brand">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" width="24" height="24">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
           </svg>
-          <input
-            type="text"
-            placeholder="Search stocks…"
-            autoComplete="off"
-            spellCheck="false"
-            value={query}
-            onChange={handleInput}
-            onKeyDown={(e) => e.key === "Escape" && setOpen(false)}
-          />
+          Stock Analyzer
+        </Link>
+
+        <div className="navbar-search-wrap" ref={wrapRef}>
+          <div className="navbar-search-box">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
+            </svg>
+            <input
+              type="text"
+              placeholder="Search stocks…"
+              autoComplete="off"
+              spellCheck="false"
+              value={query}
+              onChange={handleInput}
+              onKeyDown={(e) => e.key === "Escape" && setOpen(false)}
+            />
+          </div>
+
+          {open && (
+            <div className="nav-ac-dropdown show">
+              {results.length === 0 ? (
+                <div className="nav-ac-empty">No Indian stocks found</div>
+              ) : (
+                results.slice(0, 7).map((item) => (
+                  <div
+                    key={item.symbol}
+                    className="nav-ac-item"
+                    onClick={() => handleSelect(item.symbol)}
+                  >
+                    <span className="nav-ac-name">{item.name}</span>
+                    <span className="nav-ac-sym">{item.symbol}</span>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
         </div>
 
-        {open && (
-          <div className="nav-ac-dropdown show">
-            {results.length === 0 ? (
-              <div className="nav-ac-empty">No Indian stocks found</div>
-            ) : (
-              results.slice(0, 7).map((item) => (
-                <div
-                  key={item.symbol}
-                  className="nav-ac-item"
-                  onClick={() => handleSelect(item.symbol)}
-                >
-                  <span className="nav-ac-name">{item.name}</span>
-                  <span className="nav-ac-sym">{item.symbol}</span>
-                </div>
-              ))
-            )}
-          </div>
-        )}
-      </div>
-
-      <div className="navbar-right">
-        <ul className="navbar-links">
-          <li><Link to="/" className={isActive("/") ? "active-nav" : ""}>Home</Link></li>
-          <li><Link to="/portfolio" className={isActive("/portfolio") ? "active-nav" : ""}>Portfolio</Link></li>
-          <li><Link to="/about" className={isActive("/about") ? "active-nav" : ""}>About</Link></li>
-        </ul>
-        <button className="theme-toggle" onClick={toggleTheme} title="Toggle theme">
-          <svg className="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-          </svg>
-          <svg className="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
-            <circle cx="12" cy="12" r="5" />
-            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
-          </svg>
-        </button>
-      </div>
-    </nav>
+        <div className="navbar-right">
+          <ul className="navbar-links">
+            <li><Link to="/" className={isActive("/") ? "active-nav" : ""}>Home</Link></li>
+            <li><Link to="/portfolio" className={isActive("/portfolio") ? "active-nav" : ""}>Portfolio</Link></li>
+            <li><Link to="/about" className={isActive("/about") ? "active-nav" : ""}>About</Link></li>
+          </ul>
+          <button
+            className={`theme-toggle settings-gear-btn${settingsOpen ? " active" : ""}`}
+            onClick={() => setSettingsOpen((v) => !v)}
+            title="API Settings"
+            aria-label="API Settings"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+            </svg>
+          </button>
+          <button className="theme-toggle" onClick={toggleTheme} title="Toggle theme">
+            <svg className="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+            </svg>
+            <svg className="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
+              <circle cx="12" cy="12" r="5" />
+              <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+            </svg>
+          </button>
+        </div>
+      </nav>
+      <Settings open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+    </>
   );
 }

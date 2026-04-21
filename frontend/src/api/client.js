@@ -1,6 +1,36 @@
 const BASE = import.meta.env.VITE_API_BASE_URL || "/api";
 
-const TIMEOUT_MS = 5000;
+const TIMEOUT_MS = 8000;
+
+function getSettings() {
+  try {
+    return JSON.parse(localStorage.getItem("sa_settings") || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function resolveSymbol(symbol) {
+  const s = getSettings();
+  const provider = s.provider || "yahoo";
+  if (provider === "yahoo") {
+    const hasSuffix = symbol.includes(".") || symbol.startsWith("^");
+    if (!hasSuffix) {
+      const exchange = s.exchange || "NS";
+      return symbol + "." + exchange;
+    }
+  }
+  return symbol;
+}
+
+function providerParams() {
+  const s = getSettings();
+  const params = new URLSearchParams();
+  const provider = s.provider || "yahoo";
+  if (provider !== "yahoo") params.set("provider", provider);
+  if (s.apiKey) params.set("apikey", s.apiKey);
+  return params.toString();
+}
 
 async function apiFetch(path) {
   const controller = new AbortController();
@@ -11,7 +41,7 @@ async function apiFetch(path) {
     res = await fetch(`${BASE}${path}`, { signal: controller.signal });
   } catch (err) {
     clearTimeout(timer);
-    if (err.name === "AbortError") throw new Error("Request timed out after 5 seconds");
+    if (err.name === "AbortError") throw new Error("Request timed out. The data provider may be slow.");
     throw new Error(`Network error: ${err.message}`);
   }
   clearTimeout(timer);
@@ -36,17 +66,22 @@ async function apiFetch(path) {
 }
 
 export function getFundamentals(symbol) {
-  return apiFetch(`/fundamentals?symbol=${encodeURIComponent(symbol)}`);
+  const resolved = resolveSymbol(symbol);
+  return apiFetch(`/fundamentals?symbol=${encodeURIComponent(resolved)}`);
 }
 
 export function getFinancials(symbol) {
-  return apiFetch(`/financials?symbol=${encodeURIComponent(symbol)}`);
+  const resolved = resolveSymbol(symbol);
+  return apiFetch(`/financials?symbol=${encodeURIComponent(resolved)}`);
 }
 
 export function getAutocomplete(q) {
   return apiFetch(`/autocomplete?q=${encodeURIComponent(q)}`);
 }
 
-export function getStock(symbol, provider = "yfinance") {
-  return apiFetch(`/stock?symbol=${encodeURIComponent(symbol)}&provider=${encodeURIComponent(provider)}`);
+export function getStock(symbol, provider) {
+  const resolved = resolveSymbol(symbol);
+  const extra = providerParams();
+  const base = `/stock?symbol=${encodeURIComponent(resolved)}`;
+  return apiFetch(extra ? `${base}&${extra}` : base);
 }
