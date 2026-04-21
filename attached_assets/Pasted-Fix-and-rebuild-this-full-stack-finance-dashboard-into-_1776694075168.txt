@@ -1,0 +1,113 @@
+Fix and rebuild this full-stack finance dashboard into a stable production-ready app.
+
+GOAL:
+A working stock dashboard where ALL features work reliably:
+- stock search
+- multiple API providers
+- about page
+- no crashes
+- no invalid JSON errors
+- no infinite loading
+
+---
+
+CORE SYSTEM FIX (IMPORTANT):
+
+1. Fix backend so ALL endpoints are stable:
+   - /api/stock must always work
+   - no matter symbol or provider
+   - must NEVER return HTML
+   - must ALWAYS return valid JSON
+
+2. Create unified backend handler:
+
+   Endpoint:
+   /api/stock?symbol=RELIANCE.NS&provider=finnhub
+
+   Backend must:
+   - detect provider
+   - call correct API
+   - normalize response into same format:
+
+   {
+     symbol,
+     price,
+     change,
+     percentChange,
+     source
+   }
+
+   If API fails:
+   - fallback to secondary API
+   - if all fail → return safe JSON error (NOT HTML)
+
+---
+
+API PROVIDERS (USER SELECTABLE):
+
+Add frontend dropdown to switch APIs:
+
+1. Finnhub (primary)
+2. Alpha Vantage
+3. Twelve Data
+4. Mock fallback (always works offline)
+
+Store selection in localStorage.
+
+Frontend must send:
+provider parameter to backend.
+
+---
+
+FRONTEND FIXES:
+
+- Fix "Unexpected token <" error permanently
+- Never assume response is JSON without checking
+- Add proper loading + error UI
+- Fix INP / UI freezing issues (no blocking event handlers)
+- Ensure async fetch is handled safely
+
+---
+
+PAGE CHANGES:
+
+1. REMOVE screener page completely
+2. REPLACE with About page
+
+About page must include:
+- Project description
+- How stock data works
+- List of supported APIs
+- Disclaimer (not financial advice)
+- Clean UI
+
+Routes:
+- / → dashboard
+- /about → about page
+
+---
+
+STABILITY RULES:
+
+- No endpoint should hang or timeout indefinitely
+- All API calls must have timeout (5s max)
+- All fetch calls must be wrapped in try/catch
+- Never return raw HTML from backend
+- Always sanitize external API responses
+
+---
+
+FINAL GOAL:
+
+A stable finance dashboard where:
+- user can search stocks
+- user can switch APIs
+- app never crashes
+- frontend never breaks due to JSON errors
+- about page replaces screener
+- system behaves like a production app
+
+Prioritize:
+1. stability
+2. simplicity
+3. reliability

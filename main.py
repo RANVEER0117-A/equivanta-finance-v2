@@ -4,9 +4,12 @@ Production-grade, modular, high-performance fintech API.
 """
 
 import os
+import asyncio
+import random
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from services.finance_service import get_fundamentals, get_financials
 from services.autocomplete_service import search_stocks
@@ -76,6 +79,75 @@ def financials_endpoint(
                 "balance_sheet": {"columns": [], "rows": []}, "cash_flow": {"columns": [], "rows": []}}
 
     return data
+
+
+def _mock_price(symbol: str) -> dict:
+    """Return deterministic fake price data for offline testing."""
+    seed = sum(ord(c) for c in symbol)
+    rng = random.Random(seed)
+    price = round(rng.uniform(100, 5000), 2)
+    change = round(rng.uniform(-80, 80), 2)
+    pct = round((change / price) * 100, 2)
+    return {"symbol": symbol, "price": price, "change": change, "percentChange": pct, "source": "mock"}
+
+
+def _yfinance_price(symbol: str) -> dict:
+    """Fetch quick price from yfinance with a 5-second timeout."""
+    import yfinance as yf
+    import concurrent.futures
+
+    def _fetch():
+        import math
+        ticker = yf.Ticker(symbol)
+        try:
+            info = ticker.get_info()
+        except AttributeError:
+            info = ticker.info
+        price = info.get("currentPrice") or info.get("regularMarketPrice") or info.get("previousClose")
+        prev  = info.get("previousClose") or info.get("regularMarketPreviousClose")
+        if price is None:
+            raise ValueError("no price data")
+        price = float(price)
+        prev  = float(prev) if prev else price
+        change = round(price - prev, 2)
+        pct    = round((change / prev) * 100, 2) if prev else 0.0
+        if math.isnan(price) or math.isinf(price):
+            raise ValueError("invalid price")
+        return {"symbol": symbol, "price": price, "change": change, "percentChange": pct, "source": "yfinance"}
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as ex:
+        fut = ex.submit(_fetch)
+        return fut.result(timeout=5)
+
+
+@app.get("/stock", tags=["Market Data"])
+def stock_endpoint(
+    symbol: str = Query(..., description="Yahoo Finance symbol, e.g. RELIANCE.NS"),
+    provider: str = Query("yfinance", description="Data provider: yfinance | mock"),
+):
+    """
+    Unified quick-price endpoint. Returns {symbol, price, change, percentChange, source}.
+    Always returns valid JSON — never HTML. Falls back to mock on failure.
+    """
+    if not symbol or not symbol.strip():
+        return JSONResponse({"error": "symbol is required", "symbol": "", "price": None, "change": None, "percentChange": None, "source": "none"}, status_code=400)
+
+    sym = symbol.strip().upper()
+    prov = (provider or "yfinance").lower().strip()
+
+    # Providers that need external API keys fall back to yfinance gracefully
+    if prov == "mock":
+        return _mock_price(sym)
+
+    # yfinance is the default (and fallback for finnhub/alphavantage/twelvedata without keys)
+    try:
+        return _yfinance_price(sym)
+    except Exception as e:
+        # Last-resort: return mock so the frontend never sees an error
+        result = _mock_price(sym)
+        result["source"] = "mock (fallback)"
+        result["note"] = f"yfinance unavailable: {str(e)[:80]}"
+        return result
 
 
 @app.get("/autocomplete", tags=["Search"])

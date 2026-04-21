@@ -17,7 +17,8 @@ A full-stack Indian stock market analyzer with live fundamentals, TradingView ch
 - `frontend/src/pages/Home.jsx` — Hero section with pill search, feature chips, popular stocks chips
 - `frontend/src/pages/Stock.jsx` — Sticky 8-tab sub-nav (Summary/Chart/About/Quarters/P&L/Balance Sheet/Cash Flow/Ratios), IntersectionObserver for active tab, company-header, metrics grid, TradingView chart, about/pros/cons, financial tables, ratios grid
 - `frontend/src/pages/Portfolio.jsx` — localStorage portfolio tracker, 4 summary cards (Invested/Current/P&L/Return), autocomplete add flow, holdings table, insights section
-- `frontend/src/components/Navbar.jsx` — Sticky navbar with live autocomplete, active-nav via useLocation, Screener link
+- `frontend/src/pages/About.jsx` — Project description, how-it-works steps, API sources, features list, tech stack, legal disclaimer
+- `frontend/src/components/Navbar.jsx` — Sticky navbar with live autocomplete, active-nav via useLocation, About link
 - `frontend/src/components/Footer.jsx` — Dark `#111827` footer, Navigate + Indices columns, Dark Mode toggle
 - `frontend/src/api/client.js` — Centralized API client (proxies /api to backend)
 - `frontend/src/index.css` — ~750 lines full CSS, Screener.in-like theme, `#00a86b` green, dark mode overrides
@@ -26,6 +27,7 @@ A full-stack Indian stock market analyzer with live fundamentals, TradingView ch
 - `GET /` — Health check
 - `GET /fundamentals?symbol=RELIANCE.NS` — Key fundamentals + `_raw` values (cached 15 min)
 - `GET /financials?symbol=RELIANCE.NS` — Quarterly/annual P&L, Balance Sheet, Cash Flow in ₹ Cr
+- `GET /stock?symbol=RELIANCE.NS&provider=yfinance` — Unified quick-price endpoint. Providers: `yfinance` (default), `mock`. Always returns valid JSON, never HTML. Falls back to mock if yfinance fails.
 - `GET /autocomplete?q=tata` — Stock search suggestions
 - `GET /docs` — Swagger UI
 

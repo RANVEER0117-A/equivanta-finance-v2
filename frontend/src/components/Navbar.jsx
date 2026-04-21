@@ -113,7 +113,7 @@ export default function Navbar() {
         <ul className="navbar-links">
           <li><Link to="/" className={isActive("/") ? "active-nav" : ""}>Home</Link></li>
           <li><Link to="/portfolio" className={isActive("/portfolio") ? "active-nav" : ""}>Portfolio</Link></li>
-          <li><a href="#">Screener</a></li>
+          <li><Link to="/about" className={isActive("/about") ? "active-nav" : ""}>About</Link></li>
         </ul>
         <button className="theme-toggle" onClick={toggleTheme} title="Toggle theme">
           <svg className="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
