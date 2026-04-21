@@ -1,0 +1,137 @@
+Here’s the final Replit prompt tailored exactly for your goal — a plug-and-play Vercel-ready ZIP:
+
+
+---
+
+Prompt:
+
+Fix and rebuild my stock web app:
+https://equivanta-finance-v2.vercel.app/
+
+Core Problem
+
+When selecting any stock, the app shows:
+“Could not load data – Expected JSON but got text/html (status 200)”
+
+This means the app is incorrectly returning an HTML page instead of JSON data, likely due to broken API routing or improper deployment structure.
+
+
+---
+
+Your Objective
+
+Completely fix and restructure the project so that the final output is a ready-to-deploy ZIP file for Vercel that works instantly without any manual configuration.
+
+
+---
+
+Mandatory Requirements
+
+1. Fix API System
+
+Ensure all stock data requests return valid JSON only
+
+Eliminate any scenario where HTML is returned instead of JSON
+
+Handle invalid stock symbols and errors properly with structured responses
+
+
+
+---
+
+2. Correct Architecture (Very Important)
+
+Ensure frontend never calls itself accidentally
+
+Fix all routing so API requests go to proper backend logic
+
+If architecture is broken, automatically restructure it
+
+
+
+---
+
+3. Vercel-Ready Serverless Setup
+
+Convert entire backend into Vercel serverless functions
+
+No dependency on running servers (no persistent backend)
+
+Ensure everything works within Vercel’s native environment
+
+
+
+---
+
+4. Reliable Stock Data Integration
+
+Use a stable free stock API
+
+Ensure proper symbol handling (especially Indian stocks like RELIANCE.NS, TCS.NS)
+
+Add fallback handling if API fails or returns empty data
+
+
+
+---
+
+5. Strong Error Handling
+
+Detect and handle non-JSON responses
+
+Show clean UI messages for:
+
+Invalid symbols
+
+API failures
+
+No data available
+
+
+
+
+---
+
+6. Mobile Optimization
+
+Ensure full responsiveness across all screen sizes
+
+Fix layout breaking, overflow, and scaling issues
+
+Charts and UI must adapt cleanly on mobile devices
+
+
+
+---
+
+7. Final Output (CRITICAL)
+
+Provide a clean ZIP file structured for Vercel deployment
+
+No additional setup required after upload
+
+No manual config, no fixes needed after deployment
+
+Must work immediately when deployed on Vercel
+
+
+
+---
+
+End Goal
+
+A fully working stock app where:
+
+Selecting a stock always loads data correctly
+
+No JSON/HTML errors occur
+
+App works perfectly on both desktop and mobile
+
+Deployment on Vercel is instant and seamless
+
+
+
+---
+
+If something is fundamentally broken, rebuild the structure instead of patching it.
