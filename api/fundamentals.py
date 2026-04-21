@@ -16,10 +16,27 @@ class handler(BaseHTTPRequestHandler):
                 return send_json(self, {"error": "symbol is required"}, status=400)
             data = get_fundamentals(symbol)
             if "error" in data:
-                return send_json(self, data, status=200)
+                err_msg = str(data["error"])
+                if "429" in err_msg or "Too Many Requests" in err_msg:
+                    friendly = "Yahoo Finance is rate-limiting requests. Please try again in a moment."
+                elif "No data" in err_msg or "Could not fetch" in err_msg:
+                    friendly = f"No data found for '{symbol}'. Check the symbol is valid (e.g. RELIANCE.NS)."
+                else:
+                    friendly = "Could not fetch live data from Yahoo Finance right now."
+                return send_json(self, {
+                    "symbol": symbol,
+                    "name": symbol,
+                    "_warning": friendly,
+                    "_cache": "MISS",
+                }, status=200)
             return send_json(self, data, status=200)
         except Exception as e:
-            return send_json(self, {"error": f"server error: {str(e)[:200]}", "symbol": ""}, status=200)
+            return send_json(self, {
+                "symbol": "",
+                "name": "",
+                "_warning": "Could not fetch live data from Yahoo Finance right now.",
+                "_cache": "MISS",
+            }, status=200)
 
     def do_OPTIONS(self):
         send_json(self, {}, status=200)
