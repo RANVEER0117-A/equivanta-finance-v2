@@ -56,7 +56,21 @@ def fundamentals_endpoint(
     data = get_fundamentals(symbol.strip().upper())
 
     if "error" in data:
-        raise HTTPException(status_code=502, detail=data["error"])
+        # Return a partial response instead of failing hard, so the frontend
+        # can still render the chart and show a warning.
+        err_msg = str(data["error"])
+        if "429" in err_msg or "Too Many Requests" in err_msg:
+            friendly = "Yahoo Finance is rate-limiting requests. Please try again in a moment."
+        elif "No data returned" in err_msg:
+            friendly = f"No data found for '{symbol}'. Check the symbol is valid (e.g. RELIANCE.NS)."
+        else:
+            friendly = "Could not fetch live data from Yahoo Finance right now."
+        return JSONResponse({
+            "symbol": symbol.strip().upper(),
+            "name": symbol.strip().upper(),
+            "_warning": friendly,
+            "_cache": "MISS",
+        })
 
     return data
 

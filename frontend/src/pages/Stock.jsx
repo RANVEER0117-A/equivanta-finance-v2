@@ -90,6 +90,7 @@ export default function Stock() {
   const [financials, setFinancials] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [warning, setWarning] = useState(null);
   const [activeTab, setActiveTab] = useState("top");
   const chartLoaded = useRef(false);
 
@@ -97,18 +98,24 @@ export default function Stock() {
     if (!decoded) return;
     setLoading(true);
     setError(null);
+    setWarning(null);
     setData(null);
     setFinancials(null);
     chartLoaded.current = false;
 
-    Promise.all([
+    Promise.allSettled([
       getFundamentals(decoded),
       getFinancials(decoded),
-    ]).then(([fund, fin]) => {
-      setData(fund);
-      setFinancials(fin);
-    }).catch((err) => {
-      setError(err.message || "Failed to load data");
+    ]).then(([fundResult, finResult]) => {
+      if (fundResult.status === "fulfilled") {
+        setData(fundResult.value);
+        if (fundResult.value._warning) setWarning(fundResult.value._warning);
+      } else {
+        setError(fundResult.reason?.message || "Failed to load fundamentals");
+      }
+      if (finResult.status === "fulfilled") {
+        setFinancials(finResult.value);
+      }
     }).finally(() => setLoading(false));
   }, [decoded]);
 
@@ -257,6 +264,15 @@ export default function Stock() {
             <p>{error}</p>
             <p>Check the symbol is valid (e.g. RELIANCE.NS, TCS.NS)</p>
           </section>
+        )}
+
+        {warning && !error && (
+          <div className="warning-banner">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            {warning} The chart below is still available.
+          </div>
         )}
 
         {data && (

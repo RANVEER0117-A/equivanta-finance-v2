@@ -460,6 +460,25 @@ body.stock-body, .stock-container ~ * { }
 .error-card h2 { padding: 1.5rem 1.5rem 0; color: #e53935; margin-bottom: 0.5rem; }
 .error-card p  { padding: 0 1.5rem; color: var(--text-muted); margin-bottom: 0.4rem; }
 
+.warning-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: #fff8e1;
+  border: 1px solid #f9a825;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  color: #7a5800;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+[data-theme="dark"] .warning-banner {
+  background: #2d2200;
+  border-color: #f9a825;
+  color: #ffd54f;
+}
+.warning-banner svg { flex-shrink: 0; color: #f9a825; }
+
 /* ═══════════════════════════════════════════════════════
    PORTFOLIO PAGE
    ═══════════════════════════════════════════════════════ */
